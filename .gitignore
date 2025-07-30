@@ -1,0 +1,51 @@
+# Ignore binaries and build artifacts
+Binaries/
+Build/
+DerivedDataCache/
+Intermediate/
+Saved/
+
+# Ignore user settings
+.vscode/
+.idea/
+*.code-workspace
+*.sublime-project
+*.sublime-workspace
+
+# Ignore OS junk
+.DS_Store
+Thumbs.db
+
+# Ignore compiled assets
+*.pdb
+*.obj
+*.exe
+*.dll
+*.lib
+*.app
+*.so
+*.dylib
+
+# Ignore Unreal-specific backup files
+*.sdf
+*.opensdf
+*.suo
+*.VC.db
+*.VC.opendb
+
+# Ignore logs
+*.log
+
+# Ignore compiled Python
+__pycache__/
+*.pyc
+
+# Ignore Unreal Launcher Vault content
+VaultCache/
+
+# If using Rider
+.idea/
+
+# Ignore Git LFS locking files (optional)
+*.lck
+
