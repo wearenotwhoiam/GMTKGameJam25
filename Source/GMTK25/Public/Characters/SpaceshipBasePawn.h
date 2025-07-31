@@ -6,6 +6,7 @@
 #include "GameFramework/Pawn.h"
 #include "SpaceshipBasePawn.generated.h"
 
+
 UCLASS()
 class GMTK25_API ASpaceshipBasePawn : public APawn
 {
