@@ -14,8 +14,7 @@ APlayerSpaceship::APlayerSpaceship()
 
 	//Capsule and Mesh Setup
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent"));
-	CapsuleComponent->InitCapsuleSize(100.f, 100.f);
-	CapsuleComponent->SetCollisionProfileName(TEXT("Pawn"));
+	CapsuleComponent->InitCapsuleSize(500.f, 500.f);
 	RootComponent = CapsuleComponent;
 
 	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BaseMesh"));
@@ -24,15 +23,15 @@ APlayerSpaceship::APlayerSpaceship()
 
 	//Camera Setup
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 500.f;
-	CameraBoom->SocketOffset = FVector(0, 0, 90);
-	CameraBoom->bUsePawnControlRotation = true;
+	CameraBoom->SetupAttachment(GetRootComponent());
+	CameraBoom->TargetArmLength = 2400.f;
+	CameraBoom->SetRelativeRotation(FRotator(-90.f, 0.f, 0.f));
+	CameraBoom->bUsePawnControlRotation = false;
 
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-	FollowCamera->SetupAttachment(CameraBoom);
-	FollowCamera->AddLocalRotation(FRotator(-90.f, 0.f, 0.f));
-
+	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+	FollowCamera->SetRelativeLocation(FVector(0.f, 0.f, 1250.f));
+	FollowCamera->bUsePawnControlRotation = false;
 	//Input Setup
 }
 
