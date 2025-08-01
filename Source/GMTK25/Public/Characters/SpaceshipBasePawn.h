@@ -4,15 +4,39 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "AbilitySystemInterface.h"
 #include "SpaceshipBasePawn.generated.h"
 
+class USpaceshipAbilitySystemComponent;
+class USpaceshipAttributeSet;
 
 UCLASS()
-class GMTK25_API ASpaceshipBasePawn : public APawn
+class GMTK25_API ASpaceshipBasePawn : public APawn ,public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this pawn's properties
 	ASpaceshipBasePawn();
+
+	//~ Begin IAbilitySystemInterface Interface.
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const;
+	//~ End IAbilitySystemInterface Interface.
+
+protected:
+	//~ Begin APawn Interface.
+	virtual void PossessedBy(AController* NewController) override;
+	//~ End APawn Interface.
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AbilitySystem")
+	USpaceshipAbilitySystemComponent* SpaceshipAbilitySystemComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AbilitySystem")
+	USpaceshipAttributeSet* SpaceshipAttributeSet;
+
+
+public:
+	FORCEINLINE USpaceshipAbilitySystemComponent* GetSpaceshipAbilitySystemComponent() const { return SpaceshipAbilitySystemComponent; }
+	
+	FORCEINLINE USpaceshipAttributeSet* GetSpaceshipAttributeSet()  const { return SpaceshipAttributeSet; }
 };

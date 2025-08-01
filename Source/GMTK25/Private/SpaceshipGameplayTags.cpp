@@ -8,4 +8,5 @@ namespace SpaceshipGameplayTags
 	/*Input Tags*/
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Throttle, "InputTag.Throttle")
 	UE_DEFINE_GAMEPLAY_TAG(InputTag_Turn, "InputTag.Turn")
+	UE_DEFINE_GAMEPLAY_TAG(InputTag_LookUp, "InputTag.LookUp")
 }

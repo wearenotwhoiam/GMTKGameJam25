@@ -9,4 +9,5 @@ namespace SpaceshipGameplayTags
 	/*Input Tags*/
 	GMTK25_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Throttle)
 	GMTK25_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_Turn)
+	GMTK25_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(InputTag_LookUp)
 }
