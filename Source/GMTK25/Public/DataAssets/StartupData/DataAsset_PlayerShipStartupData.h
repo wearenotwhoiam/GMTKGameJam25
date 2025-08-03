@@ -4,23 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "DataAssets/StartupData/DataAsset_StartupDataBase.h"
-#include "GameplayTagContainer.h"
+#include "SpaceshipStructType.h"
 
 #include "DataAsset_PlayerShipStartupData.generated.h"
 
-USTRUCT(BlueprintType)
-struct FPlayerShipAbilitySet
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "InputTag"))
-	FGameplayTag InputTag;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<USpaceshipGameplayAbility> AbilityToGrant;
-
-	bool IsValid() const;
-};
 /**
  * 
  */

@@ -5,11 +5,6 @@
 #include "AbilitySystem/SpaceshipAbilitySystemComponent.h"
 #include "AbilitySystem/Abilities/SpaceshipGameplayAbility.h"
 
-bool FPlayerShipAbilitySet::IsValid() const
-{
-	return InputTag.IsValid() && AbilityToGrant;
-}
-
 void UDataAsset_PlayerShipStartupData::GiveToAbilitySystemComponent(USpaceshipAbilitySystemComponent* InASCToGive, int32 ApplyLevel)
 {
 	Super::GiveToAbilitySystemComponent(InASCToGive, ApplyLevel);

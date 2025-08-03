@@ -53,28 +53,37 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CharacterData", meta = (AllowPrivateAccess = "true"))
 	UDataAsset_InputConfig* InputConfigDataAsset;
 
-	APlayerController* PlayerController;
-
 	void Input_Throttle(const FInputActionValue& InputActionValue);
 	void Input_Turn(const FInputActionValue& InputActionValue);
 	void Input_Strafe(const FInputActionValue& InputActionValue);
+	void Input_Roll(const FInputActionValue& InputActionValue);
 
 	void Input_AbilityInputPressed(FGameplayTag InInputTag);
 	void Input_AbilityInputReleased(FGameplayTag InInputTag);
 #pragma endregion
 
 #pragma region Movement
-	float ThrottleValue{ 0.f };
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MovementSettings", meta = (AllowPrivateAccess = "true"))
-	float Acceleration{ 100.f };
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MovementSettings", meta = (AllowPrivateAccess = "true"))
-	float MaxSpeed{ 10000.f };
+	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float Acceleration = 2000.f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MovementSettings", meta = (AllowPrivateAccess = "true"))
-	float MinSpeed = -MaxSpeed;
+	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float MaxSpeed = 6000.f;
 
-	float CurrentForwardSpeed = 0;
+	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float MinSpeed = -3000.f;
+
+	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float StrafeSpeed = 2000.f;
+
+	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float RollSpeed = 80.f;
+
+	float CurrentForwardSpeed = 0.f;
+	float ThrottleValue = 0.f;
+	FVector2D StrafeInput = FVector2D::ZeroVector; 
+	float RollInput = 0.f;
 #pragma endregion
+
 public:
 	FORCEINLINE UPlayerShipActionComponent* GetPlayerShipActionComponent() const { return PlayerShipActionComponent; }
 };

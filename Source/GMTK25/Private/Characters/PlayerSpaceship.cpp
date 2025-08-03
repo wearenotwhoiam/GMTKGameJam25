@@ -63,7 +63,13 @@ void APlayerSpaceship::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 	SpaceshipInputComponent->BindNativeInputAction(InputConfigDataAsset, SpaceshipGameplayTags::InputTag_Throttle, ETriggerEvent::Completed, this, &ThisClass::Input_Throttle);
 
 	SpaceshipInputComponent->BindNativeInputAction(InputConfigDataAsset, SpaceshipGameplayTags::InputTag_Turn, ETriggerEvent::Triggered, this, &ThisClass::Input_Turn);
+
 	SpaceshipInputComponent->BindNativeInputAction(InputConfigDataAsset, SpaceshipGameplayTags::InputTag_Strafe, ETriggerEvent::Triggered, this, &ThisClass::Input_Strafe);
+	SpaceshipInputComponent->BindNativeInputAction(InputConfigDataAsset, SpaceshipGameplayTags::InputTag_Strafe, ETriggerEvent::Completed, this, &ThisClass::Input_Strafe);
+
+	SpaceshipInputComponent->BindNativeInputAction(InputConfigDataAsset, SpaceshipGameplayTags::InputTag_Roll, ETriggerEvent::Triggered, this, &ThisClass::Input_Roll);
+	SpaceshipInputComponent->BindNativeInputAction(InputConfigDataAsset, SpaceshipGameplayTags::InputTag_Roll, ETriggerEvent::Completed, this, &ThisClass::Input_Roll);
+
 
 	SpaceshipInputComponent->BindAbilityInputAction(InputConfigDataAsset, this, &ThisClass::Input_AbilityInputPressed, &ThisClass::Input_AbilityInputReleased);
 }
@@ -71,6 +77,7 @@ void APlayerSpaceship::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 void APlayerSpaceship::BeginPlay()
 {
 	Super::BeginPlay();
+	CurrentForwardSpeed = 0;
 }
 
 void APlayerSpaceship::PossessedBy(AController* NewController)
@@ -90,21 +97,38 @@ void APlayerSpaceship::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (ThrottleValue != 0.f)
-	{
-		const float CurrentAcceleration = Acceleration * ThrottleValue;
-		const float NewForwardSpeed = CurrentForwardSpeed + (CurrentAcceleration * DeltaTime);
-		CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
+	float TargetAcceleration = Acceleration * ThrottleValue;
 
+	if (FMath::IsNearlyZero(ThrottleValue))
+	{
+		const float DecelerationRate = Acceleration * 0.75f;
+		if (CurrentForwardSpeed > 0.f)
+		{
+			CurrentForwardSpeed -= DecelerationRate * DeltaTime;
+			CurrentForwardSpeed = FMath::Max(CurrentForwardSpeed, 0.f);
+		}
+		else if (CurrentForwardSpeed < 0.f)
+		{
+			CurrentForwardSpeed += DecelerationRate * DeltaTime;
+			CurrentForwardSpeed = FMath::Min(CurrentForwardSpeed, 0.f);
+		}
 	}
 	else
 	{
-		const float DecelerationRate = Acceleration * 0.01f;
-		const float NewForwardSpeed = FMath::FInterpTo(CurrentForwardSpeed, 0.f, DeltaTime, DecelerationRate);
-		CurrentForwardSpeed = NewForwardSpeed;
+		CurrentForwardSpeed += TargetAcceleration * DeltaTime;
+
 	}
-	const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaTime, 0.f, 0.f);
-	AddActorLocalOffset(LocalMove, true);
+
+	CurrentForwardSpeed = FMath::Clamp(CurrentForwardSpeed, MinSpeed, MaxSpeed);
+
+	const FVector ForwardMove = FVector(CurrentForwardSpeed * DeltaTime, 0.f, 0.f);
+	const FVector StrafeMove = FVector(0.f, StrafeInput.X * StrafeSpeed, StrafeInput.Y * StrafeSpeed);
+
+	AddActorLocalOffset(ForwardMove + StrafeMove, true);
+
+	FRotator DeltaRotation = FRotator::ZeroRotator;
+	DeltaRotation.Roll = RollInput * RollSpeed * DeltaTime;
+	AddActorLocalRotation(FQuat(DeltaRotation));
 }
 void APlayerSpaceship::Input_Throttle(const FInputActionValue& InputActionValue)
 {
@@ -120,7 +144,12 @@ void APlayerSpaceship::Input_Turn(const FInputActionValue& InputActionValue)
 
 void APlayerSpaceship::Input_Strafe(const FInputActionValue& InputActionValue)
 {
-	const FVector2D MovementVector = InputActionValue.Get<FVector2D>();
+	StrafeInput = InputActionValue.Get<FVector2D>();
+}
+
+void APlayerSpaceship::Input_Roll(const FInputActionValue& InputActionValue)
+{
+	RollInput = InputActionValue.Get<float>();
 }
 
 void APlayerSpaceship::Input_AbilityInputPressed(FGameplayTag InInputTag)
