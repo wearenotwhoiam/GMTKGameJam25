@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Characters/SpaceshipBasePawn.h"
+#include "GameplayTagContainer.h"
 #include "PlayerSpaceship.generated.h"
 
 
@@ -11,6 +12,7 @@ class UCameraComponent;
 class USpringArmComponent;
 class UCapsuleComponent;
 class UDataAsset_InputConfig;
+class UPlayerShipActionComponent;
 struct FInputActionValue;
 
 /**
@@ -43,6 +45,8 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Actions", meta = (AllowPrivateAccess = "true"))
+	UPlayerShipActionComponent* PlayerShipActionComponent;
 #pragma endregion	
 
 #pragma region Inputs
@@ -53,11 +57,14 @@ private:
 
 	void Input_Throttle(const FInputActionValue& InputActionValue);
 	void Input_Turn(const FInputActionValue& InputActionValue);
+	void Input_Strafe(const FInputActionValue& InputActionValue);
+
+	void Input_AbilityInputPressed(FGameplayTag InInputTag);
+	void Input_AbilityInputReleased(FGameplayTag InInputTag);
 #pragma endregion
 
 #pragma region Movement
 	float ThrottleValue{ 0.f };
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MovementSettings", meta = (AllowPrivateAccess = "true"))
 	float Acceleration{ 100.f };
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MovementSettings", meta = (AllowPrivateAccess = "true"))
@@ -68,4 +75,6 @@ private:
 
 	float CurrentForwardSpeed = 0;
 #pragma endregion
+public:
+	FORCEINLINE UPlayerShipActionComponent* GetPlayerShipActionComponent() const { return PlayerShipActionComponent; }
 };

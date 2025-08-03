@@ -9,7 +9,7 @@
 
 class USpaceshipAbilitySystemComponent;
 class USpaceshipAttributeSet;
-
+class UDataAsset_PlayerShipStartupData;
 UCLASS()
 class GMTK25_API ASpaceshipBasePawn : public APawn ,public IAbilitySystemInterface
 {
@@ -20,7 +20,7 @@ public:
 	ASpaceshipBasePawn();
 
 	//~ Begin IAbilitySystemInterface Interface.
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const;
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	//~ End IAbilitySystemInterface Interface.
 
 protected:
@@ -34,7 +34,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AbilitySystem")
 	USpaceshipAttributeSet* SpaceshipAttributeSet;
 
-
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CharacterData")
+	TSoftObjectPtr<UDataAsset_PlayerShipStartupData> CharacterStartupData;
 public:
 	FORCEINLINE USpaceshipAbilitySystemComponent* GetSpaceshipAbilitySystemComponent() const { return SpaceshipAbilitySystemComponent; }
 	

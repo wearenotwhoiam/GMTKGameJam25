@@ -11,6 +11,10 @@
 #include "Camera/CameraComponent.h"
 #include "SpaceshipGameplayTags.h"
 #include "AbilitySystem/SpaceshipAbilitySystemComponent.h"
+#include "Components/Action/PlayerShipActionComponent.h"
+
+#include "DataAssets/StartupData/DataAsset_StartupDataBase.h"
+#include "DataAssets/StartupData/DataAsset_PlayerShipStartupData.h"
 
 #include "DebugHelper.h"
 
@@ -41,6 +45,8 @@ APlayerSpaceship::APlayerSpaceship()
 
 	bUseControllerRotationYaw = true;
 	bUseControllerRotationPitch = true;
+
+	PlayerShipActionComponent = CreateDefaultSubobject<UPlayerShipActionComponent>(TEXT("PlayerShipActionComponent"));
 }
 
 void APlayerSpaceship::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -57,6 +63,9 @@ void APlayerSpaceship::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 	SpaceshipInputComponent->BindNativeInputAction(InputConfigDataAsset, SpaceshipGameplayTags::InputTag_Throttle, ETriggerEvent::Completed, this, &ThisClass::Input_Throttle);
 
 	SpaceshipInputComponent->BindNativeInputAction(InputConfigDataAsset, SpaceshipGameplayTags::InputTag_Turn, ETriggerEvent::Triggered, this, &ThisClass::Input_Turn);
+	SpaceshipInputComponent->BindNativeInputAction(InputConfigDataAsset, SpaceshipGameplayTags::InputTag_Strafe, ETriggerEvent::Triggered, this, &ThisClass::Input_Strafe);
+
+	SpaceshipInputComponent->BindAbilityInputAction(InputConfigDataAsset, this, &ThisClass::Input_AbilityInputPressed, &ThisClass::Input_AbilityInputReleased);
 }
 
 void APlayerSpaceship::BeginPlay()
@@ -68,8 +77,14 @@ void APlayerSpaceship::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	const FString ASCText = FString::Printf(TEXT("Owner Actor: %s, Avatar Actor: %s"), *SpaceshipAbilitySystemComponent->GetOwnerActor()->GetActorLabel(), *SpaceshipAbilitySystemComponent->GetAvatarActor()->GetActorLabel());
-	Debug::Print(ASCText);
+	if (!CharacterStartupData.IsNull())
+	{
+		if (UDataAsset_StartupDataBase* LoadedData = CharacterStartupData.LoadSynchronous())
+		{
+			LoadedData->GiveToAbilitySystemComponent(SpaceshipAbilitySystemComponent);
+		}
+	}
+
 }
 void APlayerSpaceship::Tick(float DeltaTime)
 {
@@ -80,13 +95,16 @@ void APlayerSpaceship::Tick(float DeltaTime)
 		const float CurrentAcceleration = Acceleration * ThrottleValue;
 		const float NewForwardSpeed = CurrentForwardSpeed + (CurrentAcceleration * DeltaTime);
 		CurrentForwardSpeed = FMath::Clamp(NewForwardSpeed, MinSpeed, MaxSpeed);
-		const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaTime, 0.f, 0.f);
-		AddActorLocalOffset(LocalMove, true);
+
 	}
 	else
 	{
-		CurrentForwardSpeed = 0.f;
+		const float DecelerationRate = Acceleration * 0.01f;
+		const float NewForwardSpeed = FMath::FInterpTo(CurrentForwardSpeed, 0.f, DeltaTime, DecelerationRate);
+		CurrentForwardSpeed = NewForwardSpeed;
 	}
+	const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaTime, 0.f, 0.f);
+	AddActorLocalOffset(LocalMove, true);
 }
 void APlayerSpaceship::Input_Throttle(const FInputActionValue& InputActionValue)
 {
@@ -98,4 +116,19 @@ void APlayerSpaceship::Input_Turn(const FInputActionValue& InputActionValue)
 	FVector2D Direction = InputActionValue.Get<FVector2D>();
 	if(Direction.Y != 0) AddControllerPitchInput(-Direction.Y);
 	if(Direction.X != 0) AddControllerYawInput(Direction.X);
+}
+
+void APlayerSpaceship::Input_Strafe(const FInputActionValue& InputActionValue)
+{
+	const FVector2D MovementVector = InputActionValue.Get<FVector2D>();
+}
+
+void APlayerSpaceship::Input_AbilityInputPressed(FGameplayTag InInputTag)
+{
+	SpaceshipAbilitySystemComponent->OnAbilityInputPressed(InInputTag);
+}
+
+void APlayerSpaceship::Input_AbilityInputReleased(FGameplayTag InInputTag)
+{
+	SpaceshipAbilitySystemComponent->OnAbilityInputReleased(InInputTag);
 }

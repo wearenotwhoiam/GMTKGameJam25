@@ -23,6 +23,8 @@ void ASpaceshipBasePawn::PossessedBy(AController* NewController)
 	if (SpaceshipAbilitySystemComponent)
 	{
 		SpaceshipAbilitySystemComponent->InitAbilityActorInfo(this, this);
+
+		ensureMsgf(!CharacterStartupData.IsNull(), TEXT("No Startup data assigned to: %s"), *GetName());
 	}
 }
 
